@@ -11,6 +11,7 @@ import { Property } from '../../types/property/property';
 import { useQuery } from '@apollo/client';
 import { GET_PROPERTIES } from '../../../apollo/user/query';
 import { T } from '../../types/common';
+import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
 
 interface TopPropertiesProps {
 	initialInput: PropertiesInquiry;
@@ -37,6 +38,17 @@ const TopProperties = (props: TopPropertiesProps) => {
 
 	/** HANDLERS **/
 
+	const likePropertyHandler = async (user: T, id: string) => {
+  	  try {
+		// execute likeTarget Mutation
+		// execute getPropertiesRefetch
+		await sweetTopSmallSuccessAlert('Success', 800);
+  	  } catch (err: any) {
+   	 	console.log('ERROR, likePropertyHandler:', err.message);
+   	    sweetMixinErrorAlert(err.message).then();
+	  }
+	};
+
 	if (device === 'mobile') {
 		return (
 			<Stack className={'top-properties'}>
@@ -55,7 +67,7 @@ const TopProperties = (props: TopPropertiesProps) => {
 							{topProperties.map((property: Property) => {
 								return (
 									<SwiperSlide className={'top-property-slide'} key={property?._id}>
-										<TopPropertyCard property={property} />
+										<TopPropertyCard property={property} likePropertyHandler={likePropertyHandler}/>
 									</SwiperSlide>
 								);
 							})}
@@ -98,7 +110,7 @@ const TopProperties = (props: TopPropertiesProps) => {
 							{topProperties.map((property: Property) => {
 								return (
 									<SwiperSlide className={'top-property-slide'} key={property?._id}>
-										<TopPropertyCard property={property} />
+										<TopPropertyCard property={property} likePropertyHandler={likePropertyHandler} />
 									</SwiperSlide>
 								);
 							})}
