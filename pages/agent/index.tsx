@@ -60,10 +60,11 @@ const AgentList: NextPage = ({ initialInput, ...props }: any) => {
 		if (router.query.input) {
 			const input_obj = JSON.parse(router?.query?.input as string);
 			setSearchFilter(input_obj);
-		} else
+			setCurrentPage(input_obj.page === undefined ? 1 : input_obj.page);
+		} else {
 			router.replace(`/agent?input=${JSON.stringify(searchFilter)}`, `/agent?input=${JSON.stringify(searchFilter)}`);
-
-		setCurrentPage(searchFilter.page === undefined ? 1 : searchFilter.page);
+			setCurrentPage(searchFilter.page === undefined ? 1 : searchFilter.page);
+		}
 	}, [router]);
 
 	/** HANDLERS **/
@@ -77,35 +78,39 @@ const AgentList: NextPage = ({ initialInput, ...props }: any) => {
 		setAnchorEl(null);
 	};
 
-	const sortingHandler = (e: React.MouseEvent<HTMLLIElement>) => {
+	const pushSearchFilter = async (filter: any) => {
+		await router.push(`/agent?input=${JSON.stringify(filter)}`, `/agent?input=${JSON.stringify(filter)}`, {
+			scroll: false,
+		});
+	};
+
+	const sortingHandler = async (e: React.MouseEvent<HTMLLIElement>) => {
+		let sortFilter = {};
 		switch (e.currentTarget.id) {
 			case 'recent':
-				setSearchFilter({ ...searchFilter, sort: 'createdAt', direction: 'DESC' });
+				sortFilter = { sort: 'createdAt', direction: 'DESC' };
 				setFilterSortName('Recent');
 				break;
 			case 'old':
-				setSearchFilter({ ...searchFilter, sort: 'createdAt', direction: 'ASC' });
+				sortFilter = { sort: 'createdAt', direction: 'ASC' };
 				setFilterSortName('Oldest order');
 				break;
 			case 'likes':
-				setSearchFilter({ ...searchFilter, sort: 'memberLikes', direction: 'DESC' });
+				sortFilter = { sort: 'memberLikes', direction: 'DESC' };
 				setFilterSortName('Likes');
 				break;
 			case 'views':
-				setSearchFilter({ ...searchFilter, sort: 'memberViews', direction: 'DESC' });
+				sortFilter = { sort: 'memberViews', direction: 'DESC' };
 				setFilterSortName('Views');
 				break;
 		}
 		setSortingOpen(false);
-		setAnchorEl2(null);
+		setAnchorEl(null);
+		await pushSearchFilter({ ...searchFilter, ...sortFilter, page: 1 });
 	};
 
 	const paginationChangeHandler = async (event: ChangeEvent<unknown>, value: number) => {
-		searchFilter.page = value;
-		await router.push(`/agent?input=${JSON.stringify(searchFilter)}`, `/agent?input=${JSON.stringify(searchFilter)}`, {
-			scroll: false,
-		});
-		setCurrentPage(value);
+		await pushSearchFilter({ ...searchFilter, page: value });
 	};
 
 	const likeMemberHandler = async (user: any, id: string) => {
@@ -142,9 +147,10 @@ const AgentList: NextPage = ({ initialInput, ...props }: any) => {
 								onChange={(e: any) => setSearchText(e.target.value)}
 								onKeyDown={(event: any) => {
 									if (event.key == 'Enter') {
-										setSearchFilter({
+										pushSearchFilter({
 											...searchFilter,
 											search: { ...searchFilter.search, text: searchText },
+											page: 1,
 										});
 									}
 								}}
