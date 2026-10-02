@@ -210,10 +210,14 @@ const AddProperty = ({ initialValues, ...props }: any) => {
 										type="text"
 										className="description-input"
 										placeholder={'Price'}
-										value={insertPropertyData.propertyPrice}
-										onChange={({ target: { value } }) =>
-											setInsertPropertyData({ ...insertPropertyData, propertyPrice: parseInt(value) })
-										}
+										value={insertPropertyData.propertyPrice || ''}
+										onChange={({ target: { value } }) => {
+											const digits = value.replace(/\D/g, '');
+											setInsertPropertyData({
+												...insertPropertyData,
+												propertyPrice: digits === '' ? 0 : Number(digits),
+											});
+										}}
 									/>
 								</Stack>
 								<Stack className="price-year-after-price">

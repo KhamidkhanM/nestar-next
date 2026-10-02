@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { NextPage } from 'next';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { Button, Stack, Typography } from '@mui/material';
@@ -16,6 +16,7 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 	const token = getJwtToken();
 	const user = useReactiveVar(userVar);
 	const [updateData, setUpdateData] = useState<MemberUpdate>(initialValues);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	/** APOLLO REQUESTS **/
 	const [updateMember] = useMutation(UPDATE_MEMBER);
@@ -34,7 +35,9 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 	/** HANDLERS **/
 	const uploadImage = async (e: any) => {
 		try {
-			const image = e.target.files[0];
+			const image = e.target.files?.[0];
+			e.target.value = '';
+			if (!image) return;
 			console.log('+image:', image);
 
 			const formData = new FormData();
@@ -139,13 +142,13 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 								<input
 									type="file"
 									hidden
-									id="hidden-input"
+									ref={fileInputRef}
 									onChange={uploadImage}
 									accept="image/jpg, image/jpeg, image/png"
 								/>
-								<label htmlFor="hidden-input" className="labeler">
+								<button type="button" className="labeler" onClick={() => fileInputRef.current?.click()}>
 									<Typography>Upload Profile Image</Typography>
-								</label>
+								</button>
 								<Typography className="upload-text">A photo must be in JPG, JPEG or PNG format!</Typography>
 							</Stack>
 						</Stack>
