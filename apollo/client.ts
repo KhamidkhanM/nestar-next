@@ -28,6 +28,25 @@ const tokenRefreshLink = new TokenRefreshLink({
 	},
 });
 
+//Custom Websocket Client
+class LoggingWebSocket extends WebSocket {
+	constructor(url: string | URL, protocols?: string | string[]) {
+		super(url, protocols);
+		this.addEventListener('open', (event) => {
+			console.log('WebSocket connection opened:', event);
+		});
+		this.addEventListener('message', (msg) => {
+			console.log('WebSocket message received:', msg.data);
+		});
+		this.addEventListener('error', (error) => {
+			console.error('WebSocket error:', error);
+		});
+		this.addEventListener('close', (event) => {
+			console.log('WebSocket connection closed:', event.code, event.reason);
+		});
+	}
+}
+
 function createIsomorphicLink() {
 	if (typeof window !== 'undefined') {
 		const authLink = new ApolloLink((operation, forward) => {
@@ -56,6 +75,7 @@ function createIsomorphicLink() {
 					return { headers: getHeaders() };
 				},
 			},
+			webSocketImpl: LoggingWebSocket,
 		});
 
 		const errorLink = onError(({ graphQLErrors, networkError, response }) => {
