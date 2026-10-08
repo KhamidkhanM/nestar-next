@@ -1,12 +1,11 @@
 import { useMemo } from 'react';
-import { ApolloClient, ApolloLink, InMemoryCache, split, from, NormalizedCacheObject } from '@apollo/client';
+import { ApolloClient, ApolloLink, InMemoryCache, from, NormalizedCacheObject } from '@apollo/client';
 import createUploadLink from 'apollo-upload-client/public/createUploadLink.js';
-import { WebSocketLink } from '@apollo/client/link/ws';
-import { getMainDefinition } from '@apollo/client/utilities';
 import { onError } from '@apollo/client/link/error';
 import { getJwtToken } from '../libs/auth';
 import { TokenRefreshLink } from 'apollo-link-token-refresh';
 import { sweetErrorAlert } from '../libs/sweetAlert';
+import { socketVar } from './store';
 let apolloClient: ApolloClient<NormalizedCacheObject>;
 
 function getHeaders() {
@@ -28,23 +27,19 @@ const tokenRefreshLink = new TokenRefreshLink({
 	},
 });
 
-//Custom Websocket Client
-class LoggingWebSocket extends WebSocket {
-	constructor(url: string | URL, protocols?: string | string[]) {
-		super(url, protocols);
-		this.addEventListener('open', (event) => {
-			console.log('WebSocket connection opened:', event);
-		});
-		this.addEventListener('message', (msg) => {
-			console.log('WebSocket message received:', msg.data);
-		});
-		this.addEventListener('error', (error) => {
-			console.error('WebSocket error:', error);
-		});
-		this.addEventListener('close', (event) => {
-			console.log('WebSocket connection closed:', event.code, event.reason);
-		});
-	}
+/* CHAT SOCKET */
+function createChatSocket() {
+	const url = process.env.REACT_APP_API_WS ?? 'ws://127.0.0.1:3007';
+	const socket = new WebSocket(`${url}?token=${getJwtToken()}`);
+	socketVar(socket);
+
+	socket.onopen = () => {
+		console.log('WebSocket connection!');
+	};
+
+	socket.onerror = (error) => {
+		console.log('WebSocket, error:', error);
+	};
 }
 
 function createIsomorphicLink() {
@@ -65,18 +60,7 @@ function createIsomorphicLink() {
 			uri: process.env.REACT_APP_API_GRAPHQL_URL,
 		});
 
-		/* WEBSOCKET SUBSCRIPTION LINK */
-		const wsLink = new WebSocketLink({
-			uri: process.env.REACT_APP_API_WS ?? 'ws://127.0.0.1:3007',
-			options: {
-				reconnect: false,
-				timeout: 30000,
-				connectionParams: () => {
-					return { headers: getHeaders() };
-				},
-			},
-			webSocketImpl: LoggingWebSocket,
-		});
+		createChatSocket();
 
 		const errorLink = onError(({ graphQLErrors, networkError, response }) => {
 			if (graphQLErrors) {
@@ -91,16 +75,7 @@ function createIsomorphicLink() {
 			}
 		});
 
-		const splitLink = split(
-			({ query }) => {
-				const definition = getMainDefinition(query);
-				return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
-			},
-			wsLink,
-			authLink.concat(link),
-		);
-
-		return from([errorLink, tokenRefreshLink, splitLink]);
+		return from([errorLink, tokenRefreshLink, authLink.concat(link)]);
 	}
 }
 

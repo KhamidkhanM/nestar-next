@@ -972,3 +972,80 @@
 		}
 	}
 }
+
+// Refined homepage rhythm and listing cards.
+#pc-wrap .home-page {
+	.info-box .left span {
+		font-weight: 600 !important;
+		letter-spacing: -1.1px !important;
+	}
+
+	.trend-properties,
+	.top-properties,
+	.popular-properties,
+	.top-agents,
+	.events,
+	.community-boards {
+		height: auto;
+		min-height: 0;
+		padding-top: 88px;
+		padding-bottom: 88px;
+	}
+
+	.trend-properties,
+	.top-properties,
+	.top-agents,
+	.events,
+	.community-boards {
+		background: #fff;
+	}
+
+	.popular-properties {
+		background: #f4f6f2;
+	}
+
+	.trend-card-box,
+	.popular-card-box,
+	.top-card-box,
+	.top-agent-card {
+		border-radius: 18px;
+		overflow: hidden;
+		box-shadow: 0 8px 28px rgba(25, 39, 31, 0.08);
+		transition: transform 180ms ease, box-shadow 180ms ease;
+		&:hover {
+			transform: translateY(-4px);
+			box-shadow: 0 16px 36px rgba(25, 39, 31, 0.14);
+		}
+		.card-img {
+			border-radius: 0;
+		}
+		.info {
+			border: 1px solid #e7ebe6;
+			border-top: 0;
+			border-radius: 0 0 18px 18px;
+			box-shadow: none;
+		}
+	}
+
+	@media (max-width: 1200px) {
+		.trend-properties,
+		.top-properties,
+		.popular-properties,
+		.top-agents,
+		.events,
+		.community-boards {
+			padding-top: 64px;
+			padding-bottom: 64px;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.trend-card-box,
+		.popular-card-box,
+		.top-card-box,
+		.top-agent-card {
+			transition: none;
+			&:hover { transform: none; }
+		}
+	}
+}

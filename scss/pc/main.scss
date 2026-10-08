@@ -177,29 +177,44 @@ body::-webkit-scrollbar {
 		height: 860px;
 		background-image: url('/img/banner/header1.svg');
 		background-size: cover;
+		background-position: center;
+		isolation: isolate;
+		&::before {
+			content: '';
+			position: absolute;
+			inset: 0;
+			z-index: -1;
+			background: linear-gradient(180deg, rgba(12, 25, 23, 0.44) 0%, rgba(16, 30, 27, 0.13) 46%, rgba(16, 30, 27, 0.58) 100%);
+			pointer-events: none;
+		}
 		.container {
 			position: relative;
-			margin-top: 20px;
+			margin-top: 0;
+			padding-top: 48px;
 			flex-direction: column;
 			align-items: center;
+			z-index: 1;
 			.search-box {
 				position: relative;
 				margin-top: 56px;
-				padding: 16px 29px;
+				padding: 16px 18px;
 				width: 1094px;
-				height: 96px;
+				min-height: 96px;
 				display: flex;
 				flex-direction: row;
 				justify-content: space-between;
-				background: rgba(255, 255, 255, 0.28);
-				border-radius: 12px;
+				background: rgba(255, 255, 255, 0.94);
+				border: 1px solid rgba(255, 255, 255, 0.74);
+				border-radius: 18px;
+				box-shadow: 0 22px 70px rgba(9, 25, 22, 0.2);
+				backdrop-filter: blur(16px);
 				.select-box {
 					width: 712px;
 					display: flex;
 					flex-direction: row;
 					justify-content: space-between;
 					.box {
-						padding: 24px 22px;
+						padding: 16px 18px;
 						width: 213px;
 						height: 56px;
 						display: flex;
@@ -207,12 +222,15 @@ body::-webkit-scrollbar {
 						align-items: center;
 						justify-content: space-between;
 						border-radius: 12px;
-						background: rgba(255, 255, 255, 0.575);
+						background: #f5f7f5;
+						border: 1px solid transparent;
 						box-sizing: border-box;
 						cursor: pointer;
+						transition: border-color 160ms ease, background 160ms ease;
+						&:hover { background: #eef3ef; }
 						&.on {
 							background: #ffffff;
-							border: 1px solid #000;
+							border: 1px solid #71877a;
 							color: #181a20;
 						}
 						span {
@@ -259,8 +277,10 @@ body::-webkit-scrollbar {
 						align-items: center;
 						justify-content: center;
 						border-radius: 55px;
-						background: #f17742;
+						background: #1e4738;
+						transition: background 160ms ease, transform 160ms ease;
 						cursor: pointer;
+						&:hover { background: #16392d; transform: translateY(-1px); }
 						svg {
 							width: 20px;
 							height: 20px;
